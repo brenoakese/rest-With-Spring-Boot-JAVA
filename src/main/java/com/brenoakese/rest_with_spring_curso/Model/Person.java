@@ -1,5 +1,6 @@
 package com.brenoakese.rest_with_spring_curso.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -16,13 +17,21 @@ public class Person implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column (name = "first_Name",nullable = false, length = 80)
+    @JsonProperty("firstName")
     private String FirstName;
+
     @Column (name = "last_Name",nullable = false, length = 80)
+    @JsonProperty("lastName")
     private String LastName;
+
     @Column (nullable = false, length = 100)
+    @JsonProperty("address")
     private String Address;
+
     @Column (nullable = false, length = 6)
+    @JsonProperty("gender")
     private String gender;
 
 

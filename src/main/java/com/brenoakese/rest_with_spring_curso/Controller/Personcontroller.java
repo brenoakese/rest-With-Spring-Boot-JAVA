@@ -6,10 +6,8 @@ import com.brenoakese.rest_with_spring_curso.PersonServices.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,23 +18,39 @@ public class Personcontroller {
     @Autowired
     private PersonService personService;
 
-    @RequestMapping(value = "/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE
-
+    @GetMapping(value = "/{id}",
+                produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Person findPesonById(@PathVariable("id") String id) {
+    public Person findPesonById(@PathVariable("id") Long id) {
         return personService.findById(id);
     }
 
+g
+    @GetMapping( produces = MediaType.APPLICATION_JSON_VALUE )
+    public List<Person> findAll(){ return personService.findAll(); }
 
-    @RequestMapping(
-            method = RequestMethod.GET,
+    @PostMapping(
+            value = "/create",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<Person> findAll(){
+    public Person create(@RequestBody Person person) { return personService.create(person); }
 
-        return personService.findAll();
+    @PutMapping(
+            value = "/update/{id}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public Person update(@PathVariable("id") Long id, @RequestBody Person person) {
+       return personService.update(id, person);
+    }
 
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+
+
+        personService.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
