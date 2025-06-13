@@ -1,15 +1,18 @@
 package com.brenoakese.rest_with_spring_curso.PersonServices;
 
+import com.brenoakese.rest_with_spring_curso.DTOs.PersonDTO;
 import com.brenoakese.rest_with_spring_curso.Model.Person;
+import static com.brenoakese.rest_with_spring_curso.mapper.objectMapper.parseObjectList;
+import static  com.brenoakese.rest_with_spring_curso.mapper.objectMapper.parseObject;
 import com.brenoakese.rest_with_spring_curso.repository.PersonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Optional;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -23,46 +26,33 @@ public class PersonService {
     private PersonRepository personRepository;
 
 
-    public Person findById(Long id) {
+    public PersonDTO findById(Long id) {
         logger.info("Finding person with id {}", id);
 
+        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found with id: " + id));
 
-        return personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found with id: " + id));
+        return parseObject(person, PersonDTO.class);
     }
 
 
-    public List<Person> findAll(){
+    public List<PersonDTO> findAll(){
 
         logger.info("Finding all persons");
 
-        List<Person> people = new ArrayList<>();
-
-        for (int i = 0; i < 9; i++) {
-            people.add(mockPerson(i));
-        }
-
-        return people;
+       return parseObjectList(personRepository.findAll(), PersonDTO.class);
     }
 
-    public Person create(Person person) {
-        logger.info("Creating person {}", person);
+    public PersonDTO create(PersonDTO personDTO) {
+        logger.info("Creating person {}", personDTO);
 
-        return personRepository.save(person);
+        var newPerson = parseObject(personDTO, Person.class);
+
+        return parseObject(personRepository.save(newPerson), PersonDTO.class);
     }
 
 
-    public Person mockPerson(int i){
-        Person person = new Person();
-        person.setId(counter.incrementAndGet());
-        person.setFirstName("Person " + i);
-        person.setLastName("Last Name " + i);
-        person.setAddress("Address " + i);
-        person.setGender("MALE");
 
-        return person;
-    }
-
-    public Person update(Long id, Person person) {
+    public PersonDTO update(Long id, PersonDTO person) {
        Person existingPerson = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found with id: " + id));
 
         logger.info("Updating person with id {}", id);
@@ -72,7 +62,7 @@ public class PersonService {
         existingPerson.setAddress(person.getAddress());
         existingPerson.setGender(person.getGender());
 
-        return personRepository.save(existingPerson);
+        return  parseObject(personRepository.save(existingPerson), PersonDTO.class);
     }
 
     public void delete(Long id) {
